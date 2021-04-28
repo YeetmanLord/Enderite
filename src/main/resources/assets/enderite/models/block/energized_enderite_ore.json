@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "minecraft:block/end_stone",
+    "side": "enderite:blocks/energized_enderite_ore"
+  }
+}

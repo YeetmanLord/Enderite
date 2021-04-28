@@ -1,0 +1,63 @@
+{
+
+	"_comment": "Item Names",
+	"item.enderite.enderite_shard":"Enderite Shard",
+	"item.enderite.energized_enderite_shard":"Energized Enderite Shard",
+	"item.enderite.enderite_ingot":"Enderite Ingot",
+	"item.enderite.energized_enderite_ingot":"Energized Enderite Ingot",
+	
+	
+	"item.enderite.enderite_sword":"Enderite Sword",
+	"item.enderite.energized_enderite_sword":"Energized Enderite Sword",
+	"item.enderite.enderite_pickaxe":"Enderite Pickaxe",
+	"item.enderite.energized_enderite_pickaxe":"Energized Enderite Pickaxe",
+	"item.enderite.enderite_axe":"Enderite Axe",
+	"item.enderite.energized_enderite_axe":"Energized Enderite Axe",
+	"item.enderite.enderite_hoe":"Enderite Hoe",
+	"item.enderite.energized_enderite_hoe":"Energized Enderite Hoe",
+	"item.enderite.enderite_shovel":"Enderite Shovel",
+	"item.enderite.energized_enderite_shovel":"Energized Enderite Shovel",
+	
+	
+	
+	"item.enderite.enderite_helmet":"Enderite Helmet",
+	"item.enderite.energized_enderite_helmet":"Energized Enderite Helmet",
+	"item.enderite.enderite_chestplate":"Enderite Chestplate",
+	"item.enderite.energized_enderite_chestplate":"Energized Enderite Chestplate",
+	"item.enderite.enderite_leggings":"Enderite Leggings",
+	"item.enderite.energized_enderite_leggings":"Energized Enderite Leggings",
+	"item.enderite.enderite_boots":"Enderite Boots",
+	"item.enderite.energized_enderite_boots":"Energized Enderite Boots",
+	
+	
+	
+	
+	
+	"__comment": "Block Names",
+	"block.enderite.enderite_ore": "Enderite Ore",
+	"block.enderite.energized_enderite_ore": "Energized Enderite Ore",
+	"block.enderite.energizer": "Energizer",
+	
+	
+	"___comment": "Tab Names",
+	"itemGroup.moditemstab": "§5Items",
+	
+	
+	"____comment": "Advancements",
+	"advancements.husbandry.enderite_hoe.title": "§4A Useless Investment",
+	"advancements.husbandry.enderite_hoe.description": "§6Obtain an Energized Enderite Hoe",
+	
+	"advancements.end.enderite_ore.title": "§dVoid Crystal",
+	"advancements.end.enderite_ore.description": "§6Find the rare Enderite",
+	
+	"advancements.end.energized_enderite_ore.title": "§bThe Sparkling Gem",
+	"advancements.end.energized_enderite_ore.description": "§6Obtain the energized form of Enderite",
+	
+	"advancements.end.enderite_armor.title": "§4§lTHE POWER!!",
+	"advancements.end.enderite_armor.description": "§5Craft each piece of Enderite armor",
+
+	
+	"-Comment": "Stats",
+	"stat.enderite.interact_with_energizer": "Interactions With Energizers"
+
+}

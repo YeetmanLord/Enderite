@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "enderite:blocks/energizer_top",
+    "front": "enderite:blocks/energizer_front",
+    "side": "enderite:blocks/energizer_side"
+  }
+}
