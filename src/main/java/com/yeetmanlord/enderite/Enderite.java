@@ -9,10 +9,12 @@ import com.yeetmanlord.enderite.core.init.ItemInit;
 import com.yeetmanlord.enderite.core.init.ModContainerTypes;
 import com.yeetmanlord.enderite.core.init.ModRecipeTypes;
 import com.yeetmanlord.enderite.core.init.ModTileEntityTypes;
+import com.yeetmanlord.enderite.world.gen.ores.OreGen;
 
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
@@ -31,6 +33,8 @@ public class Enderite
     public Enderite() {
     	final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
     	
+    		
+    	
     		modEventBus.addListener(this::setup);
     		
     		modEventBus.addListener(this::doClientStuff);
@@ -42,6 +46,8 @@ public class Enderite
         		ItemInit.ITEMS.register(modEventBus);
     				
     	instance=this;
+    	
+    	MinecraftForge.EVENT_BUS.addListener(EventPriority.HIGH, OreGen::genOres);;
     	
     	MinecraftForge.EVENT_BUS.register(this);
     }

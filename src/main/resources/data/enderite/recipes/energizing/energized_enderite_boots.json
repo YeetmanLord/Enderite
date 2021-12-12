@@ -1,0 +1,9 @@
+{
+  "type": "enderite:energizing",
+  "ingredient": {
+    "item": "enderite:enderite_boots"
+  },
+  "result": "enderite:energized_enderite_boots",
+  "experience": 20,
+  "cookingtime": 1000
+}

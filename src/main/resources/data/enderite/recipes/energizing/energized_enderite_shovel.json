@@ -1,0 +1,9 @@
+{
+  "type": "enderite:energizing",
+  "ingredient": {
+    "item": "enderite:enderite_shovel"
+  },
+  "result": "enderite:energized_enderite_shovel",
+  "experience": 20,
+  "cookingtime": 1000
+}

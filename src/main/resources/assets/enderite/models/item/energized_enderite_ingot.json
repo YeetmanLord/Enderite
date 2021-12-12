@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:item/handheld",
+  "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "enderite:items/enderite_ingot"
+    "layer0": "enderite:items/energized_enderite_ingot"
   }
 }

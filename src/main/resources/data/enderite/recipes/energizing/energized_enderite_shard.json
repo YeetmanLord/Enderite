@@ -1,0 +1,9 @@
+{
+  "type": "enderite:energizing",
+  "ingredient": {
+    "item": "enderite:enderite_shard"
+  },
+  "result": "enderite:energized_enderite_shard",
+  "experience": 20,
+  "cookingtime": 1000
+}

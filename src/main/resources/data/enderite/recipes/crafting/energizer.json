@@ -1,0 +1,30 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "gig",
+        "iIi",
+        "QeQ"
+    ],
+    "key": {
+        "g": {
+            "item": "minecraft:light_gray_stained_glass_pane"
+        },
+        "i": {
+            "item": "minecraft:iron_ingot"
+        },
+        "I": {
+            "item": "minecraft:iron_block"
+        },
+        "Q": {
+            "item": "minecraft:quartz"
+        },
+        "e": {
+            "item": "enderite:enderite_ingot"
+        }
+    },
+    "result": 
+    {
+    	"item": "enderite:energizer",
+        "count": 1
+    }
+}

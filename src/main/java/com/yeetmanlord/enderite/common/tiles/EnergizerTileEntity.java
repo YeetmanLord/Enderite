@@ -3,7 +3,6 @@ package com.yeetmanlord.enderite.common.tiles;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
@@ -22,19 +21,16 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IRecipeHelperPopulator;
-import net.minecraft.inventory.IRecipeHolder;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.LockableTileEntity;
 import net.minecraft.tileentity.TileEntityType;
@@ -43,8 +39,6 @@ import net.minecraft.util.IIntArray;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SharedConstants;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
@@ -53,11 +47,16 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
-public class EnergizerTileEntity extends LockableTileEntity implements ISidedInventory, IRecipeHolder, IRecipeHelperPopulator, ITickableTileEntity
+public class EnergizerTileEntity extends LockableTileEntity implements INamedContainerProvider, ITickableTileEntity, IIntArray, ISidedInventory
 {
+	
+	public final IItemHandlerModifiable items = createHandler();
+	
+	
 	public EnergizerTileEntity(TileEntityType<?> typeIn, IRecipeType<? extends AbstractEnergizerRecipe> recipeTypeIn) 
 	{
 		super(typeIn);
@@ -66,21 +65,24 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	
 	public EnergizerTileEntity()
 	{
-		this(ModTileEntityTypes.TILE_ENERGIZED.get(),ModRecipeTypes.Types.ENERGIZING);
+		this(ModTileEntityTypes.TILE_ENERGIZED.get(), ModRecipeTypes.Types.ENERGIZING);
 	}
 	
+	private IItemHandlerModifiable createHandler() 
+	{
+		return new InvWrapper(this);
+	}
 	
 	private static final int[] SLOTS_UP = new int[]{0};
 	   private static final int[] SLOTS_DOWN = new int[]{2, 1};
 	   private static final int[] SLOTS_HORIZONTAL = new int[]{1};
 	   protected NonNullList<ItemStack> contents = NonNullList.withSize(3, ItemStack.EMPTY);
-	   private IItemHandlerModifiable items = createHandler();
-	   private LazyOptional<IItemHandlerModifiable> itemHandler = LazyOptional.of(() -> items);
+	   private LazyOptional<IItemHandler> itemHandler = LazyOptional.of(() -> items);
 	   private int burnTime;
 	   private int burnTimeTotal;
 	   private int cookTime;
 	   private int cookTimeTotal = 1000;
-	   protected final IIntArray energizerData = new IIntArray() {
+	   public final IIntArray energizerData = new IIntArray() {
 	      public int get(int index) {
 	         switch(index) {
 	         case 0:
@@ -125,26 +127,16 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	   public static Map<Item, Integer> getBurnTimes() {
 	      Map<Item, Integer> map = Maps.newLinkedHashMap();
 	      addItemBurnTime(map, Items.NETHER_STAR, 50000);
-	      addItemBurnTime(map, Items.LAVA_BUCKET, 20000);
-	      addItemBurnTime(map, Blocks.REDSTONE_BLOCK, 16000);
-	      addItemBurnTime(map, Items.BLAZE_ROD, 2400);
-	      addItemBurnTime(map, Items.REDSTONE, 1600);
+	      addItemBurnTime(map, Items.LAVA_BUCKET, 5000);
+	      addItemBurnTime(map, Blocks.REDSTONE_BLOCK, 10000);
+	      addItemBurnTime(map, Items.BLAZE_ROD, 2000);
+	      addItemBurnTime(map, Items.REDSTONE, 1000);
 	      return map;
-	   }
-
-	   private static boolean isNonFlammable(Item item) {
-	      return ItemTags.NON_FLAMMABLE_WOOD.contains(item);
 	   }
 
 	   private static void addItemBurnTime(Map<Item, Integer> map, IItemProvider itemProvider, int burnTimeIn) {
 	      Item item = itemProvider.asItem();
-	      if (isNonFlammable(item)) {
-	         if (SharedConstants.developmentMode) {
-	            throw (IllegalStateException)Util.pauseDevMode(new IllegalStateException("A developer tried to explicitly make fire resistant item " + item.getDisplayName((ItemStack)null).getString() + " a energizer fuel. That will not work!"));
-	         }
-	      } else {
 	         map.put(item, burnTimeIn);
-	      }
 	   }
 	   
 	   
@@ -152,31 +144,35 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	      return this.burnTime > 0;
 	   }
 	   
-	   @Override
-	   public void read(BlockState state, CompoundNBT nbt) { 
-		   super.read(state, nbt);
-		  ItemStackHelper.saveAllItems(nbt, this.contents);
-	      this.burnTime = nbt.getInt("BurnTime");
-	      this.cookTime = nbt.getInt("CookTime");
-	      this.cookTimeTotal = nbt.getInt("CookTimeTotal");
-	      this.burnTimeTotal = this.getBurnTime(this.contents .get(1));
-	      CompoundNBT compoundnbt = nbt.getCompound("RecipesUsed");
+	   public void read(BlockState state, CompoundNBT nbt) { //TODO: MARK
+		      super.read(state, nbt);
+		      this.contents = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+		      ItemStackHelper.loadAllItems(nbt, this.contents);
+		      this.burnTime = nbt.getInt("BurnTime");
+		      this.cookTime = nbt.getInt("CookTime");
+		      this.cookTimeTotal = nbt.getInt("CookTimeTotal");
+		      this.burnTimeTotal = this.getBurnTime(this.contents.get(1));
+		      CompoundNBT compoundnbt = nbt.getCompound("RecipesUsed");
 
-	      for(String s : compoundnbt.keySet()) {
-	         this.recipes.put(new ResourceLocation(s), compoundnbt.getInt(s));
-	      }
+		      for(String s : compoundnbt.keySet()) {
+		         this.recipes.put(new ResourceLocation(s), compoundnbt.getInt(s));
+		      }
 
-	   }
-	   
-	   @Override
-	   public CompoundNBT write(CompoundNBT compound) {
-	      super.write(compound);
-	      compound.putInt("BurnTime", this.burnTime);
-	      compound.putInt("CookTime", this.cookTime);
-	      compound.putInt("CookTimeTotal", this.cookTimeTotal);
-	      ItemStackHelper.saveAllItems(compound, this.contents, false);
-	      return compound;
-	   }
+		   }
+
+		   public CompoundNBT write(CompoundNBT compound) {
+		      super.write(compound);
+		      compound.putInt("BurnTime", this.burnTime);
+		      compound.putInt("CookTime", this.cookTime);
+		      compound.putInt("CookTimeTotal", this.cookTimeTotal);
+		      ItemStackHelper.saveAllItems(compound, this.contents );
+		      CompoundNBT compoundnbt = new CompoundNBT();
+		      this.recipes.forEach((recipeId, craftedAmount) -> {
+		         compoundnbt.putInt(recipeId.toString(), craftedAmount);
+		      });
+		      compound.put("RecipesUsed", compoundnbt);
+		      return compound;
+		   }
 
 	   
 	@Override 
@@ -192,7 +188,7 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	         ItemStack itemstack = this.contents.get(1);
 	         if (this.isBurning() || !itemstack.isEmpty() && !this.contents.get(0).isEmpty()) {
 	            IRecipe<?> irecipe = this.world.getRecipeManager().getRecipe((IRecipeType<AbstractEnergizerRecipe>)this.recipeType, this, this.world).orElse(null);
-	            if (!this.isBurning() && this.canSmelt(irecipe)) {
+	            if (!this.isBurning() && this.canEnergize(irecipe)) {
 	               this.burnTime = this.getBurnTime(itemstack);
 	               this.burnTimeTotal = this.burnTime;
 	               if (this.isBurning()) {
@@ -210,7 +206,7 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	               }
 	            }
 
-	            if (this.isBurning() && this.canSmelt(irecipe)) {
+	            if (this.isBurning() && this.canEnergize(irecipe)) {
 	               ++this.cookTime;
 	               if (this.cookTime == this.cookTimeTotal) {
 	                  this.cookTime = 0;
@@ -228,6 +224,10 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	         if (flag != this.isBurning()) {
 	            flag1 = true;
 	            this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(EnergizerBlock.LIT, Boolean.valueOf(this.isBurning())), 3);
+	         } else if (flag = this.isBurning())
+	         {
+	        	 flag1 = false;
+	        	 this.world.setBlockState(this.pos, this.world.getBlockState(this.pos).with(EnergizerBlock.LIT, Boolean.valueOf(this.isBurning())), 3);
 	         }
 	      }
 
@@ -237,7 +237,7 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 
 	   }
 	
-	   protected boolean canSmelt(@Nullable IRecipe<?> recipeIn) {
+	   protected boolean canEnergize(@Nullable IRecipe<?> recipeIn) {
 	      if (!this.contents.get(0).isEmpty() && recipeIn != null) {
 	         ItemStack itemstack = recipeIn.getRecipeOutput();
 	         if (itemstack.isEmpty()) {
@@ -260,7 +260,7 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	   }
 	   
 	   private void energize(@Nullable IRecipe<?> recipe) {
-	      if (recipe != null && this.canSmelt(recipe)) {
+	      if (recipe != null && this.canEnergize(recipe)) {
 	         ItemStack itemstack = this.contents.get(0);
 	         ItemStack itemstack1 = recipe.getRecipeOutput();
 	         ItemStack itemstack2 = this.contents.get(2);
@@ -282,15 +282,63 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	      }
 	   }
 
-	   @SuppressWarnings("unused")
-	protected int getBurnTime(ItemStack fuel) {
+	   protected int getBurnTime(ItemStack fuel) {
 	      if (fuel.isEmpty()) {
 	         return 0;
 	      } else {
 	         Item item = fuel.getItem();
-	         return net.minecraftforge.common.ForgeHooks.getBurnTime(fuel);
+	         if(item == Items.NETHER_STAR)
+	         {
+	        	 return 20000;
+	         } else if (item == Items.LAVA_BUCKET)
+	         {
+	        	 return 5000;
+	         } else if(item == Items.REDSTONE_BLOCK)
+	         {
+	        	 return 10000;
+	         } else if (item == Items.BLAZE_ROD)
+	         {
+	        	 return 2000;
+	         } else if (item == Items.REDSTONE)
+	         {
+	        	 return 1000;
+	         } else
+	         {
+	        	 return 0;
+	         }
+	         
 	      }
 	   }
+	   
+	   protected static boolean getBurnTimeBoolean(ItemStack fuel) {
+		      if (fuel.isEmpty()) {
+		         return false;
+		      } else {
+		         Item item = fuel.getItem();
+		         if(item == Items.NETHER_STAR)
+		         {
+		        	 return true;
+		         } else if (item == Items.LAVA_BUCKET)
+		         {
+		        	 return true;
+		         } else if(item == Items.REDSTONE_BLOCK)
+		         {
+		        	 return true;
+		         } else if (item == Items.BLAZE_ROD)
+		         {
+		        	 return true;
+		         } else if (item == Items.REDSTONE)
+		         {
+		        	 return true;
+		         } else
+		         {
+		        	 return false;
+		         }
+		         
+		      }
+		   }
+	   
+	   
 
 	   @SuppressWarnings("unchecked")
 	protected int getCookTime() {
@@ -298,7 +346,7 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	   }
 
 	   public static boolean isFuel(ItemStack stack) {
-	      return net.minecraftforge.common.ForgeHooks.getBurnTime(stack) > 0;
+	      return getBurnTimeBoolean(stack);
 	   }
 
 	   public int[] getSlotsForFace(Direction side) {
@@ -452,15 +500,15 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 			}
 		}
 		
-		@Override
-		public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nonnull Direction side) 
-		{
-			if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+	   @Override
+	    public <T> LazyOptional<T> getCapability(@Nullable Capability<T> capability, @Nullable Direction facing)
+	    {
+		   if(capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
 			{
 				return itemHandler.cast();
 			}
-			return super.getCapability(cap, side);
-		}
+			return super.getCapability(capability, facing);
+	    }
 	   
 	   public List<IRecipe<?>> grantStoredRecipeExperience(World world, Vector3d pos) {
 	      List<IRecipe<?>> list = Lists.newArrayList();
@@ -474,6 +522,7 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 
 	      return list;
 	   }
+
 	   
 	   private static void splitAndSpawnExperience(World world, Vector3d pos, int craftedAmount, float experience) {
 	      int i = MathHelper.floor((float)craftedAmount * experience);
@@ -490,13 +539,6 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 
 	   }
 	   
-	   @Override
-	   public void fillStackedContents(RecipeItemHelper helper) {
-	      for(ItemStack itemstack : this.contents) {
-	         helper.accountStack(itemstack);
-	      }
-
-	   }
 
 	   net.minecraftforge.common.util.LazyOptional<? extends net.minecraftforge.items.IItemHandler>[] handlers =
 	           net.minecraftforge.items.wrapper.SidedInvWrapper.create(this, Direction.UP, Direction.DOWN, Direction.NORTH);
@@ -508,6 +550,7 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 	        handlers[x].invalidate();
 	   }
 	   
+	   
 	   @Override
 		   protected ITextComponent getDefaultName() {
 		      return new TranslationTextComponent("container.energizer");
@@ -515,14 +558,10 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 		   
 		   @Override
 		   protected Container createMenu(int id, PlayerInventory player) {
-		      return new EnergizerContainer(id, player);
+		      return new EnergizerContainer(id, this, player);
 		   }
 		   
-		   private IItemHandlerModifiable createHandler() 
-			{
-				return new InvWrapper(this);
-			}
-		   
+		   		   
 			@Override
 			public void remove() 
 			{
@@ -539,4 +578,43 @@ public class EnergizerTileEntity extends LockableTileEntity implements ISidedInv
 				Enderite.LOGGER.info("Cleared Inventory");
 				this.contents.clear();
 			}
-	}
+
+			@Override
+			public int get(int index) 
+			{
+				switch (index)
+		        {
+		            case 0:
+		                return burnTime;
+		            case 1:
+		                return burnTimeTotal;
+		            case 2:
+		                return cookTime;
+		            case 3:
+		                return cookTimeTotal;
+		        }
+		        return 0;
+			}
+
+			 @Override
+			    public void set(int index, int value)
+			    {
+			        switch (index)
+			        {
+			            case 0:
+			                burnTime = value;
+			            case 1:
+			                burnTimeTotal = value;
+			            case 2:
+			                cookTime = value;
+			            case 3:
+			                cookTimeTotal = value;
+			        }
+			    }
+
+			@Override
+			public int size() 
+			{
+				return energizerData.size();
+			}
+}

@@ -10,11 +10,11 @@ import net.minecraft.util.ResourceLocation;
 public class EnergizerRecipe extends AbstractEnergizerRecipe 
 {
 	
-	protected static int cookTime = 1000;
+	public static int cookTime = 1000;
 	
 
-	public EnergizerRecipe(ResourceLocation id, String group, Ingredient ingredient, ItemStack result, float xp) {
-		super(ModRecipeTypes.Types.ENERGIZING, ModRecipeTypes.ENERGIZE_SHARD.get(), id, group, ingredient, xp, 1000, result);
+	public EnergizerRecipe(ResourceLocation id, String group, Ingredient ingredient, ItemStack result, float xp, int time) {
+		super(ModRecipeTypes.Types.ENERGIZING, ModRecipeTypes.ENERGIZING_SERIALIZER.get(), id, group, ingredient, xp, 1000, result);
 	}
 	
 	

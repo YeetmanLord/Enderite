@@ -1,0 +1,9 @@
+{
+  "type": "enderite:energizing",
+  "ingredient": {
+    "item": "enderite:enderite_ingot"
+  },
+  "result": "enderite:energized_enderite_ingot",
+  "experience": 20,
+  "cookingtime": 1000
+}
