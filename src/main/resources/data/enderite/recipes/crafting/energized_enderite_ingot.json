@@ -2,16 +2,16 @@
     "type": "minecraft:crafting_shapeless",
     "ingredients": [
         {
-            "item": "enderite:enderite_shard"
+            "item": "enderite:energized_enderite_shard"
         },
         {
-            "item": "enderite:enderite_shard"
+            "item": "enderite:energized_enderite_shard"
         },
         {
-            "item": "enderite:enderite_shard"
+            "item": "enderite:energized_enderite_shard"
         },
         {
-            "item": "enderite:enderite_shard"
+            "item": "enderite:energized_enderite_shard"
         },
         {
             "item": "minecraft:netherite_scrap"

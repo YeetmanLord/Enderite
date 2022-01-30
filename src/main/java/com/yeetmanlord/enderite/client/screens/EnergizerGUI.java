@@ -18,15 +18,10 @@ public class EnergizerGUI extends ContainerScreen<EnergizerContainer>
 	   private static final ResourceLocation ENERGIZER_GUI_TEXTURES = new ResourceLocation(Enderite.MOD_ID, "textures/gui/container/energizer.png");
 	   private final ResourceLocation guiTexture;
 
-	public EnergizerGUI(EnergizerContainer screenContainer, PlayerInventory inv, ITextComponent titleIn, ResourceLocation guiTextureIn)
+	public EnergizerGUI(EnergizerContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
 	{
 		  super(screenContainer, inv, titleIn);
-	      this.guiTexture = guiTextureIn;
-	}
-	
-	public EnergizerGUI(EnergizerContainer screenContainer, PlayerInventory inv, ITextComponent title)
-	{
-		this(screenContainer, inv, title, ENERGIZER_GUI_TEXTURES);
+	      this.guiTexture = ENERGIZER_GUI_TEXTURES;
 	}
 	
 	@Override
